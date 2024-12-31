@@ -7,12 +7,10 @@ import (
 	"strings"
 )
 
-
-
 func getInput() [][]int {
 	input, err := os.ReadFile("input.txt")
 	if err != nil {
-		panic(err) 
+		panic(err)
 	}
 
 	lines := strings.Split(strings.TrimSpace(string(input)), "\n")
@@ -20,9 +18,9 @@ func getInput() [][]int {
 	for _, line := range lines {
 		var row []int
 		for _, val := range line {
-			num, err := strconv.Atoi(string(val)) 
+			num, err := strconv.Atoi(string(val))
 			if err != nil {
-				panic(err) 
+				panic(err)
 			}
 			row = append(row, num)
 		}
@@ -31,13 +29,13 @@ func getInput() [][]int {
 	return points
 }
 
-
 type point = [2]int
+
 func getTrailheads(input *[][]int) (trailheads []point) {
 	for y, line := range *input {
 		for x, val := range line {
 			if val == 0 {
-				trailheads = append(trailheads, point{x,y})
+				trailheads = append(trailheads, point{x, y})
 			}
 		}
 	}
@@ -45,8 +43,8 @@ func getTrailheads(input *[][]int) (trailheads []point) {
 }
 
 type direction = [2]int
-var directions = [4]direction{{1,0},{0, 1}, {-1, 0}, {0, -1}}
 
+var directions = [4]direction{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
 
 func getVal(input *[][]int, p point) int {
 	return (*input)[p[1]][p[0]]
@@ -57,7 +55,7 @@ func isInBounds(input *[][]int, p point) bool {
 }
 
 func move(p point, d direction) point {
-	return point{p[0] + d[0], p[1] + d[1]} 
+	return point{p[0] + d[0], p[1] + d[1]}
 }
 
 func isValidMove(input *[][]int, p point, d direction) bool {
@@ -67,8 +65,7 @@ func isValidMove(input *[][]int, p point, d direction) bool {
 
 type pointset = map[point]interface{}
 
-
-func collectEndpoints(input *[][]int, p point, endpoints *pointset)  {
+func collectEndpoints(input *[][]int, p point, endpoints *pointset) {
 	if !isInBounds(input, p) {
 		return
 	}
@@ -78,10 +75,9 @@ func collectEndpoints(input *[][]int, p point, endpoints *pointset)  {
 		return
 	}
 
-	
 	for _, dir := range directions {
 		if isValidMove(input, p, dir) {
-			collectEndpoints(input,move(p, dir), endpoints)
+			collectEndpoints(input, move(p, dir), endpoints)
 		}
 	}
 	return
@@ -90,7 +86,7 @@ func collectEndpoints(input *[][]int, p point, endpoints *pointset)  {
 func getScore(input *[][]int, p point) int {
 	endpoints := pointset{}
 	collectEndpoints(input, p, &endpoints)
-	return len(endpoints)	
+	return len(endpoints)
 }
 
 // part 2 funcs
@@ -111,16 +107,15 @@ func collectFullPaths(input *[][]int, p point, paths *pathset, current path) {
 		return
 	}
 
-	
 	for _, dir := range directions {
 		if isValidMove(input, p, dir) {
-			collectFullPaths(input,move(p, dir), paths, current)
+			collectFullPaths(input, move(p, dir), paths, current)
 		}
 	}
-	return	
+	return
 }
 
-func getRating(input *[][]int, p point,) int {
+func getRating(input *[][]int, p point) int {
 	paths := pathset{}
 	collectFullPaths(input, p, &paths, path{})
 	return len(paths)
@@ -132,7 +127,7 @@ func main() {
 	totalScore := 0
 	for _, trailhead := range trailheads {
 		totalScore += getScore(&input, trailhead)
-		
+
 	}
 	fmt.Println(totalScore)
 
@@ -140,7 +135,7 @@ func main() {
 	totalRating := 0
 	for _, trailhead := range trailheads {
 		totalRating += getRating(&input, trailhead)
-		
+
 	}
 	fmt.Println(totalRating)
 }
