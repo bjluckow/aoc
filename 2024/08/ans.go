@@ -8,8 +8,8 @@ import (
 
 func getInput() []string {
 	input, _ := os.ReadFile("input.txt")
-    lines := strings.Split(strings.TrimSpace(string(input)), "\n")
-    return lines
+	lines := strings.Split(strings.TrimSpace(string(input)), "\n")
+	return lines
 }
 
 func getDimensions(input []string) [2]int {
@@ -17,8 +17,8 @@ func getDimensions(input []string) [2]int {
 }
 
 type node struct {
-	x int
-	y int
+	x   int
+	y   int
 	val rune
 }
 
@@ -31,7 +31,6 @@ type node struct {
 
 		(0, n),	..., (n, n)]
 */
-
 
 func getNodes(input []string) (nodes []node) {
 	for y, line := range input {
@@ -46,11 +45,10 @@ func getNodes(input []string) (nodes []node) {
 
 type nodeset = map[node]struct{}
 
-func addNodeToSet(n node, s nodeset) nodeset  {
+func addNodeToSet(n node, s nodeset) nodeset {
 	s[n] = struct{}{}
 	return s
 }
-
 
 func getNodeSet(nodes []node) (s nodeset) {
 	s = make(nodeset)
@@ -67,13 +65,11 @@ func mergeSets(a, b nodeset) nodeset {
 	return a
 }
 
-
 func isInBounds(n node, dims [2]int) bool {
 	xMax, yMax := dims[0], dims[1]
 	x, y := n.x, n.y
-	return 0 <= x && x < xMax && 0 <= y && y < yMax 
+	return 0 <= x && x < xMax && 0 <= y && y < yMax
 }
-
 
 func normalizePair(a, b node) [2]node {
 	if a.x > b.x || (a.x == b.x && a.y > b.y) {
@@ -81,7 +77,6 @@ func normalizePair(a, b node) [2]node {
 	}
 	return [2]node{a, b}
 }
-
 
 /*
 		x
@@ -101,18 +96,17 @@ func normalizePair(a, b node) [2]node {
 		(0, n),	..., (n, n)]
 */
 
-
 func getAntinodes(a, b node, dims [2]int) (antinodes nodeset) {
 	antinodes = make(nodeset)
 
 	pair := normalizePair(a, b)
 	n1, n2 := pair[0], pair[1]
-	dx, dy := n2.x - n1.x, n2.y - n1.y
+	dx, dy := n2.x-n1.x, n2.y-n1.y
 
 	n1 = node{n1.x - dx, n1.y - dy, '#'}
 	if isInBounds(n1, dims) {
 		antinodes = addNodeToSet(n1, antinodes)
-		
+
 	}
 
 	n2 = node{n2.x + dx, n2.y + dy, '#'}
@@ -137,11 +131,10 @@ func hasPair(a, b node, s pairset) bool {
 	return ok
 }
 
-
 func getAllAntinodes(s nodeset, dims [2]int) (antinodes nodeset) {
 	antinodes = make(nodeset)
 	pairs := make(pairset)
-	
+
 	for a := range s {
 		for b := range s {
 			if (a != b) && !hasPair(a, b, pairs) {
@@ -154,6 +147,7 @@ func getAllAntinodes(s nodeset, dims [2]int) (antinodes nodeset) {
 }
 
 type nodegroups = map[rune]nodeset
+
 func groupNodesByValue(s nodeset) (groups nodegroups) {
 	groups = make(nodegroups)
 	for n := range s {
@@ -172,12 +166,12 @@ func getExtendedAntinodes(a, b node, dims [2]int) (antinodes nodeset) {
 
 	pair := normalizePair(a, b)
 	n1, n2 := pair[0], pair[1]
-	dx, dy := n2.x - n1.x, n2.y - n1.y
+	dx, dy := n2.x-n1.x, n2.y-n1.y
 
-	n1 = node{n1.x + dx, n1.y + dy, '#'}		
+	n1 = node{n1.x + dx, n1.y + dy, '#'}
 	for isInBounds(n1, dims) {
 		antinodes = addNodeToSet(n1, antinodes)
-		n1 = node{n1.x + dx, n1.y + dy, '#'}	
+		n1 = node{n1.x + dx, n1.y + dy, '#'}
 	}
 
 	n2 = node{n2.x - dx, n2.y - dy, '#'}
@@ -188,11 +182,10 @@ func getExtendedAntinodes(a, b node, dims [2]int) (antinodes nodeset) {
 	return antinodes
 }
 
-
 func getAllExtendedAntinodes(s nodeset, dims [2]int) (antinodes nodeset) {
 	antinodes = make(nodeset)
 	pairs := make(pairset)
-	
+
 	for a := range s {
 		for b := range s {
 			if (a != b) && !hasPair(a, b, pairs) {
@@ -203,7 +196,6 @@ func getAllExtendedAntinodes(s nodeset, dims [2]int) (antinodes nodeset) {
 	}
 	return antinodes
 }
-
 
 func main() {
 	input := getInput()
@@ -219,12 +211,11 @@ func main() {
 	}
 	fmt.Println(len(antinodes))
 
-
 	// part 2
 	antinodes = make(nodeset)
 	for _, s := range g {
 		antinodes = mergeSets(antinodes, getAllExtendedAntinodes(s, dims))
 	}
 	fmt.Println(len(antinodes))
-	
+
 }
